@@ -78,6 +78,8 @@ def compress_video(
 
     print(f"Found {len(video_files)} video files to compress...")
 
+    total_video_count = len(video_files)
+    processed_count = 0
     for video_file in video_files:
         # Determine output path
         output_path = os.path.join(output_dir, os.path.relpath(video_file, source_dir))
@@ -96,11 +98,15 @@ def compress_video(
         # Compress video using FFmpeg with GPU acceleration
         command = f'ffmpeg -i "{video_file}" -c:v {codec} -preset {preset} {resolution_str} {threads_option} {fps_option} "{output_path}"'
 
+        print(command)
         subprocess.run(command, shell=True)
         print(f"Compressing {video_file} to {output_path}...")
         if delete_after_compressed: 
             os.remove(video_file)
             print(f"Deleted {video_file} after compression")
+
+        processed_count+=1
+        print(f'Progress %{(processed_count/total_video_count)*100}')
              
 
     print("Compression complete. Compressed videos are saved in:", output_dir)
@@ -144,8 +150,8 @@ def main():
             "slower",
             "veryslow",
         ],
-        default="faster",
-        help="Compression preset (default: faster)",
+        default="medium",
+        help="Compression preset (default: medium)",
         required=False,
     )
     parser.add_argument(
