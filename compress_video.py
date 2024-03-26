@@ -36,7 +36,8 @@ def compress_video(
     overwrite=False,
     threads=None,
     fps=None,
-    codec="h264"
+    codec="h264",
+    delete_after_compressed=False
 ):
     # Create the output directory with timestamp added to the top-level directory name
     parent_dir, dir_name = os.path.split(source_dir)
@@ -97,6 +98,10 @@ def compress_video(
 
         subprocess.run(command, shell=True)
         print(f"Compressing {video_file} to {output_path}...")
+        if delete_after_compressed: 
+            os.remove(video_file)
+            print(f"Deleted {video_file} after compression")
+             
 
     print("Compression complete. Compressed videos are saved in:", output_dir)
 
@@ -150,9 +155,9 @@ def main():
         required=False,
     )
     parser.add_argument(
-        "--delete-once-compressed",
+        "--delete-after-compressed",
         action="store_true",
-        help="Whether to delete the original video files once compressed",
+        help="Whether to delete the original video files after compression",
         required=False,
     )
 
@@ -188,7 +193,8 @@ def main():
         args.overwrite,
         args.threads,
         args.fps,
-        args.codec
+        args.codec,
+        args.delete_after_compressed
     )
 
 
